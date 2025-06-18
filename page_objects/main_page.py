@@ -1,77 +1,81 @@
-from selenium.webdriver.common.action_chains import ActionChains
-from pages.base_page import BasePage
+from page_objects.base_page import BasePage
 from locators.main_page_locators import MainPageLocators
-from locators.base_locators import BaseLocators
+import allure
 
 class MainPage(BasePage):
-    def __init__(self, driver):
-        super().__init__(driver)
+    @allure.step('Кликнуть по кнопке перехода в личный кабинет в хэдере')
+    def click_on_personal_account_in_header(self):
+        self.wait_visibility_of_element(MainPageLocators.button_personal_account)
+        self.click_on_element(MainPageLocators.button_personal_account)
 
-    def get_ingredients(self):
-        return self.find_elements(MainPageLocators.INGREDIENTS)
+    @allure.step('Кликнуть по кнопке "Лента заказов" в хэдере')
+    def click_header_feed_button(self):
+        self.wait_visibility_of_element(MainPageLocators.button_order_feed_in_header)
+        self.click_on_element(MainPageLocators.button_order_feed_in_header)
 
-    def go_to_personal_account(self):
-        self.click_element(BaseLocators.PERSONAL_ACCOUNT_BUTTON)
+    @allure.step('Переход на страницу конструктора')
+    def click_on_button_constructor(self):
+        self.wait_visibility_of_element(MainPageLocators.header_of_page_constructor)
+        self.click_on_element(MainPageLocators.header_of_page_constructor)
 
-    def go_to_constructor(self):
-        self.click_element(BaseLocators.CONSTRUCTOR_BUTTON)
+    @allure.step('Получение главного заголовка конструктора')
+    def get_text_on_title_of_constructor(self):
+        return self.get_text_on_element(MainPageLocators.constructor_title)
 
-    def go_to_order_feed(self):
-        self.click_element(BaseLocators.ORDER_FEED_BUTTON)
+    @allure.step('Кликнуть по кнопке "Войти в аккаунт" на главной')
+    def click_on_button_login_in_main(self):
+        self.click_on_element(MainPageLocators.button_login_in_main)
 
-    def click_ingredient(self, index=0):
-        ingredients = self.get_ingredients()
-        if index < len(ingredients):
-            ingredients[index].click()
-        else:
-            raise IndexError(f"Index {index} out of range, only {len(ingredients)} ingredients available")
+    @allure.step('Проверить отображение окна о создании заказа')
+    def check_displaying_of_confirmation_modal_of_order(self):
+        self.wait_visibility_of_element(MainPageLocators.confirmation_modal_of_order)
+        return self.check_displaying_of_element(MainPageLocators.confirmation_modal_of_order)
 
-    def close_ingredient_modal(self):
-        self.click_element(BaseLocators.CLOSE_MODAL_BUTTON)
+    @allure.step('Кликнуть по ингредиенту')
+    def click_on_ingredient(self):
+        self.wait_visibility_of_element(MainPageLocators.ingredient_1)
+        self.click_on_element(MainPageLocators.ingredient_1)
 
-    def add_ingredient_to_order(self, ingredient_index=0):
-        ingredients = self.find_elements(MainPageLocators.INGREDIENTS)
-        ingredients[ingredient_index].click()
+    @allure.step('Проверить отображение окна "Детали ингредиента"')
+    def check_displaying_of_modal_details(self):
+        self.wait_visibility_of_element(MainPageLocators.header_of_modal_details)
+        return self.check_displaying_of_element(MainPageLocators.header_of_modal_details)
 
-    def drag_ingredient_to_constructor(self, ingredient_index=0):
-        ingredients = self.get_ingredients()
-        if ingredient_index < len(ingredients):
-            constructor = self.find_element(MainPageLocators.CONSTRUCTOR_AREA)
-            action = ActionChains(self.driver)
-            action.drag_and_drop(ingredients[ingredient_index], constructor).perform()
-        else:
-            raise IndexError(f"Index {ingredient_index} out of range, only {len(ingredients)} ingredients available")
+    @allure.step('Проверить, что окно "Детали ингредиента" не отображается')
+    def check_not_displaying_of_modal_details(self):
+        self.wait_for_closing_of_element(MainPageLocators.header_of_modal_details)
+        if not self.check_displaying_of_element(MainPageLocators.header_of_modal_details):
+            return True
 
-    def get_ingredient_counter(self, ingredient_index=0):
-        ingredients = self.find_elements(MainPageLocators.INGREDIENTS)
-        if len(ingredients) > ingredient_index:
-            try:
-                counter_element = ingredients[ingredient_index].find_element(*MainPageLocators.INGREDIENT_COUNTER)
-                return int(counter_element.text)
-            except:
-                return 0
-        return 0
+    @allure.step('Закрыть окно "Детали ингредиента"')
+    def close_modal(self):
+        self.wait_visibility_of_element(MainPageLocators.button_close_modal)
+        self.click_on_element(MainPageLocators.button_close_modal)
 
-    def place_order(self):
-        self.click_element(MainPageLocators.PLACE_ORDER_BUTTON)
+    @allure.step('Добавить интгридиенты')
+    def drag_and_drop_ingredient_to_order(self):
+        source_element = self.find_element_with_wait(MainPageLocators.burger_ingredient)
+        target_element = self.find_element_with_wait(MainPageLocators.place_for_ingredients)
+        self.drag_and_drop_element(source_element, target_element)
 
-    def is_ingredient_modal_open(self):
-        return self.is_element_visible(MainPageLocators.INGREDIENT_MODAL)
+    @allure.step('Получить количество ингредиентов')
+    def get_count_of_ingredients(self):
+        return self.get_text_on_element(MainPageLocators.count_of_ingredient)
 
-    def is_order_confirmation_modal_opened(self):
-        return self.is_element_visible(MainPageLocators.ORDER_CONFIRMATION_MODAL)
+    @allure.step('Кликнуть на кнопку создания заказа')
+    def click_on_button_make_order(self):
+        self.click_on_element(MainPageLocators.button_make_order)
 
-    def click_bun_tab(self):
-        self.click_element(MainPageLocators.BUN_TAB)
+    @allure.step('Проверить отображение окна о создании заказа')
+    def check_displaying_of_confirmation_modal_of_order(self):
+        return self.check_displaying_of_element(MainPageLocators.confirmation_modal_of_order)
 
-    def click_sauce_tab(self):
-        self.click_element(MainPageLocators.SAUCE_TAB)
+    @allure.step('Получить номер в окне о создании заказа')
+    def get_number_of_order_in_modal_confirmation(self):
+        self.wait_for_element_to_change_text(MainPageLocators.number_of_order_in_modal_confirmation, '9999')
+        return self.get_text_on_element(MainPageLocators.number_of_order_in_modal_confirmation)
 
-    def click_filling_tab(self):
-        self.click_element(MainPageLocators.FILLING_TAB)
-
-    def is_constructor_area_visible(self):
-        return self.is_element_visible(MainPageLocators.CONSTRUCTOR_AREA)
-
-    def is_ingredient_details_modal_opened(self):
-        return self.is_element_visible(MainPageLocators.INGREDIENT_MODAL_HEADER)
+    @allure.step('Кликнуть на кнопку закрытия окна о создании заказа')
+    def click_on_button_close_confirmation_modal(self):
+        self.check_element_is_clickable(MainPageLocators.button_close_confirmation)
+        self.click_on_element(MainPageLocators.button_close_confirmation)

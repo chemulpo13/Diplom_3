@@ -1,28 +1,49 @@
-from pages.base_page import BasePage
+from page_objects.base_page import BasePage
 from locators.password_recovery_locators import PasswordRecoveryLocators
+from helpers import *
+import allure
 
-class PasswordRecoveryPage(BasePage):
-    def __init__(self, driver):
-        super().__init__(driver)
-        self.recovery_url = f"{self.base_url}/forgot-password"
+class PasswdRecoveryPage(BasePage):
+    @allure.step('Открыть страницу восстановления пароля')
+    def navigate_to_recovery_passwd_page(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.button_forgot_password)
+        self.click_on_element(PasswordRecoveryLocators.button_forgot_password)
 
-    def open_recovery_page(self):
-        self.driver.get(self.recovery_url)
+    @allure.step('Проверить отображение поля email')
+    def check_displaying_of_input_email(self):
+        return self.check_displaying_of_element(PasswordRecoveryLocators.input_email)
 
-    def enter_email(self, email):
-        self.send_keys_to_element(PasswordRecoveryLocators.EMAIL_FIELD, email)
+    @allure.step('Ввести email')
+    def send_email(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.input_email)
+        email = create_random_email()
+        self.send_keys_to_input(PasswordRecoveryLocators.input_email, email)
 
-    def click_recover_button(self):
-        self.click_element(PasswordRecoveryLocators.RECOVER_BUTTON)
+    @allure.step('Кликнуть на кнопку "Восстановить"')
+    def click_on_recovery_button(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.button_recover)
+        self.click_on_element(PasswordRecoveryLocators.button_recover)
 
-    def click_show_hide_password(self):
-        self.click_element(PasswordRecoveryLocators.SHOW_HIDE_PASSWORD)
+    @allure.step('Проверить отображение поля password')
+    def check_displaying_of_input_password(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.input_password)
+        return self.check_displaying_of_element(PasswordRecoveryLocators.input_password)
 
-    def is_password_field_active(self):
-        return self.is_element_visible(PasswordRecoveryLocators.PASSWORD_FIELD_ACTIVE)
+    @allure.step('Ввести password')
+    def send_password(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.input_password)
+        passwd = create_random_password()
+        self.send_keys_to_input(PasswordRecoveryLocators.input_password, passwd)
 
-    def go_to_login_page(self):
-        self.click_element(PasswordRecoveryLocators.LOGIN_LINK)
+    @allure.step('Кликнуть на иконку глаза в поле ввода пароля')
+    def click_on_eye_icon(self):
+        self.wait_visibility_of_element(PasswordRecoveryLocators.eye_icon)
+        self.click_on_element(PasswordRecoveryLocators.eye_icon)
 
-    def is_recovery_page_displayed(self):
-        return self.is_element_visible(PasswordRecoveryLocators.RECOVER_BUTTON)
+    @allure.step('Проверить, что значение поля password отображается')
+    def check_displaying_password_value(self):
+        return self.check_displaying_of_element(PasswordRecoveryLocators.value_password_is_visible)
+
+    @allure.step('Проверить, что значение поля password не отображается')
+    def check_not_displaying_password_value(self):
+        return self.check_displaying_of_element(PasswordRecoveryLocators.value_password_is_invisible)
