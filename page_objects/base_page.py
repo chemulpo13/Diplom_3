@@ -9,12 +9,19 @@ class BasePage:
 
     @allure.step('Подождать прогрузки элемента')
     def wait_visibility_of_element(self, locator):
-        WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located(locator))
+        WebDriverWait(self.driver, 20).until(expected_conditions.presence_of_element_located(locator))
 
     @allure.step('Найти элемент на странице')
     def find_element_with_wait(self, locator):
         self.wait_visibility_of_element(locator)
         return self.driver.find_element(*locator)
+
+    @allure.step('Найти несколько элементов на странице')
+    def find_elements_with_wait(self, locator, timeout=10):
+        WebDriverWait(self.driver, timeout).until(
+            lambda d: len(d.find_elements(*locator)) > 0
+        )
+        return self.driver.find_elements(*locator)
 
     @allure.step('Кликнуть на элемент')
     def click_on_element(self, locator):
